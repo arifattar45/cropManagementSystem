@@ -1,0 +1,26 @@
+🌾 AI-Driven Crop Disease Prediction and Management System
+Welcome to our project repository! 🚀
+This project focuses on leveraging Artificial Intelligence to help farmers detect crop diseases early and take timely action. By analyzing crop images and environmental data, our system predicts potential disease outbreaks and provides treatment recommendations to reduce crop loss and improve yield.
+
+📌 Key Features
+AI-powered crop disease detection using machine learning (CNN).
+
+Real-time environmental data integration for accurate predictions.
+
+Actionable treatment and prevention recommendations.
+
+Mobile and web-based applications for easy farmer access.
+
+🌱 Tech Stack
+Frontend: React.js / Flutter
+
+Backend: Python (Flask/Django)
+
+Database: MySQL / MongoDB
+
+AI Libraries: TensorFlow, Keras, OpenCV
+
+Hosting: AWS / Azure
+
+🤝 Our Mission
+To empower farmers with smart agricultural tools that are affordable, accessible, and highly effective in safeguarding crops against diseases.
