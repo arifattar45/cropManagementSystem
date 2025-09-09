@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>PlantDoc AI — Ultra Premium</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+  <!-- glowing blobs for premium feel -->
+  <div class="blob a"></div>
+  <div class="blob b"></div>
+
+  <!-- particle/network canvas behind everything -->
+  <canvas id="network" style="position:fixed;inset:0;z-index:-1;pointer-events:none"></canvas>
+
+  <!-- NAV -->
+  <header>
+    <div class="nav">
+      <div class="brand">
+        <div class="logo">🌱</div>
+        <div>
+          <div style="font-weight:800">PLANTDOC</div>
+          <div style="font-size:.85rem;color:var(--muted)">AI Disease Detector</div>
+        </div>
+      </div>
+
+      <nav style="margin-left:28px">
+        <a href="#home">Home</a>
+        <a href="#upload">Upload</a>
+        <a href="#features">Features</a>
+        <a href="#results">Results</a>
+        <a href="#faq">FAQ</a>
+      </nav>
+
+      <div class="controls" aria-hidden>
+        <div style="display:flex;gap:8px;align-items:center">
+          <div style="display:flex;gap:8px">
+            <div class="color-dot" data-theme="a" style="background:radial-gradient(circle,#22d3ee,transparent)"></div>
+            <div class="color-dot" data-theme="b" style="background:radial-gradient(circle,#34d399,transparent)"></div>
+            <div class="color-dot" data-theme="c" style="background:radial-gradient(circle,#a78bfa,transparent)"></div>
+          </div>
+          <select id="lang" style="background:transparent;color:var(--text);border:1px solid rgba(255,255,255,.04);padding:6px;border-radius:8px">
+            <option value="en">English</option>
+            <option value="hi">हिन्दी</option>
+            <option value="kn">ಕನ್ನಡ</option>
+            <option value="ta">தமிழ்</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <main id="home" class="hero">
+    <div>
+      <div class="badges"><div class="badge">⚡ Instant Analysis</div><div class="badge">🧠 TensorFlow Ready</div><div class="badge">🛡️ Prevention Tips</div></div>
+      <h1 id="heroTitle">Detect Plant Diseases with <span class="highlight">Pixel-Perfect</span> Precision</h1>
+      <p class="lead" id="heroLead">Upload a leaf photo, run the model, and get a clean diagnosis with confidence score, treatment and prevention — all in a slick interactive UI.</p>
+
+      <div class="cta">
+        <button class="btn-cta" id="startBtn">Get Started</button>
+        <button class="btn-ghost" id="watchDemo">Watch Demo ▶</button>
+      </div>
+
+      <div class="kpis">
+        <div class="kpi"><div class="muted">Avg Accuracy</div><b id="statAcc">—</b></div>
+        <div class="kpi"><div class="muted">Images Scanned</div><b id="statImgs">—</b></div>
+        <div class="kpi"><div class="muted">Active Users</div><b id="statUsers">—</b></div>
+      </div>
+    </div>
+
+    <!-- upload card -->
+    <aside class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <div style="display:flex;gap:8px;align-items:center">
+          <div style="width:42px;height:42px;border-radius:10px;background:linear-gradient(90deg,var(--accent),var(--accent2));display:grid;place-items:center;color:#04101b;font-weight:800">AI</div>
+          <div>
+            <div style="font-weight:800">Upload & Diagnose</div>
+            <div class="muted" style="font-size:.9rem">On-device demo • v1.0</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <div class="muted" style="font-size:.9rem">Multi-Lang</div>
+        </div>
+      </div>
+
+      <div class="u-wrap">
+        <div id="drop" class="drop" tabindex="0">
+          <div style="font-weight:700">Drag & Drop an image here</div>
+          <small>JPG / PNG / WebP · up to 10MB · click to browse</small>
+          <input id="file" type="file" accept="image/*" style="display:none">
+        </div>
+
+        <img id="preview" class="hidden" alt="preview" style="max-width:100%;border-radius:12px;margin-top:8px">
+
+        <div class="meta hidden" id="meta">
+          <div class="pill">Resolution: <span id="res">—</span></div>
+          <div class="pill">Size: <span id="size">—</span></div>
+        </div>
+
+        <div class="controls-row">
+          <button id="analyze" class="btn btn-action" disabled>🧪 Diagnose Plant</button>
+          <button id="clear" class="btn btn-reset" disabled>Reset</button>
+          <button id="download" class="btn btn-reset" disabled>Download JSON</button>
+        </div>
+
+        <div class="pipeline">
+          <div class="row" style="margin-top:10px"><div style="display:flex;gap:8px;align-items:center"><span>📥</span><div class="muted">Loading model</div></div><div class="muted pill" id="s1">pending</div></div>
+          <div class="progress"><i id="p1"></i></div>
+
+          <div class="row"><div style="display:flex;gap:8px;align-items:center"><span>🧹</span><div class="muted">Preprocessing</div></div><div class="muted pill" id="s2">pending</div></div>
+          <div class="progress"><i id="p2"></i></div>
+
+          <div class="row"><div style="display:flex;gap:8px;align-items:center"><span>🔮</span><div class="muted">Inference</div></div><div class="muted pill" id="s3">pending</div></div>
+          <div class="progress"><i id="p3"></i></div>
+        </div>
+
+      </div>
+
+    </aside>
+  </main>
+
+  <!-- FEATURES -->
+  <section id="features" class="section">
+    <div style="max-width:1200px;margin:0 auto">
+      <h2 class="title">Premium Features</h2>
+      <p class="muted sub">Advanced UI components, micro-interactions, local preprocess, and TF-ready pipeline.</p>
+      <div class="features">
+        <div class="feature">🧠 <b>AI Analysis</b><div class="muted">Supports TF/TFJS or server endpoint</div></div>
+        <div class="feature">⚡ <b>Instant Results</b><div class="muted">Optimized pipeline & warm start</div></div>
+        <div class="feature">🛡️ <b>Advice</b><div class="muted">Treatment + Prevention tips</div></div>
+      </div>
+
+      <div class="demo-grid" style="margin-top:18px">
+        <div class="demo-card" id="demoHealthy">
+          <h3>🌿 Healthy</h3>
+          <p class="muted">Label: Healthy Plant<br>Confidence: ~95%<br>Severity: Low</p>
+          <div style="margin-top:8px"><button class="btn-ghost" data-demo="healthy">Run Example</button></div>
+        </div>
+        <div class="demo-card" id="demoInfected">
+          <h3>🍂 Diseased</h3>
+          <p class="muted">Label: Bacterial Blight<br>Confidence: ~78%<br>Severity: High</p>
+          <div style="margin-top:8px"><button class="btn-ghost" data-demo="infected">Run Example</button></div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- RESULTS -->
+  <section id="results" class="section">
+    <div style="max-width:1200px;margin:0 auto">
+      <h2 class="title">Diagnosis Results</h2>
+      <p class="muted sub">Results appear here after diagnosis.</p>
+
+      <div class="results">
+        <div class="result-panel card">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div><b id="resLabel">—</b><div class="muted">Disease</div></div>
+            <div><div id="resConf" style="font-weight:800">—</div><div class="muted">Confidence</div></div>
+          </div>
+          <div style="margin-top:12px" class="progress"><i id="confBar"></i></div>
+          <div style="margin-top:12px"><div class="muted">Severity</div><b id="resSev">—</b></div>
+          <div style="margin-top:12px"><div class="muted">Treatment</div><div id="resTreat">—</div></div>
+          <div style="margin-top:12px"><div class="muted">Prevention</div><div id="resPrev">—</div></div>
+        </div>
+
+        <div class="result-panel card">
+          <div style="display:flex;gap:8px;align-items:center;justify-content:space-between">
+            <div class="muted">Visuals</div>
+            <div class="muted">Gauge • Distribution</div>
+          </div>
+          <canvas id="gauge" width="520" height="180" style="margin-top:12px"></canvas>
+          <canvas id="bars" width="520" height="180" style="margin-top:12px"></canvas>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+<!-- =================== USER-FRIENDLY FAQ =================== -->
+<section id="faq" style="padding:60px 20px; background:#0b1220; color:white; font-family:Inter, sans-serif;">
+  <h2 style="text-align:center; font-size:32px; font-weight:700; margin-bottom:40px;">Frequently Asked Questions</h2>
+  
+  <div style="max-width:800px; margin:0 auto; display:flex; flex-direction:column; gap:20px;">
+    
+    <details style="background: rgba(255,255,255,0.05); padding:20px 24px; border-radius:16px; cursor:pointer; transition:all 0.3s ease;">
+      <summary style="font-size:18px; font-weight:600; display:flex; align-items:center; gap:10px;">🌾 Which crops does PlantDoc support?</summary>
+      <p style="margin-top:12px; font-weight:500; line-height:1.6;">PlantDoc supports major crops like wheat, rice, maize, pulses, and many fruits & vegetables. More crops are continuously added.</p>
+    </details>
+
+    <details style="background: rgba(255,255,255,0.05); padding:20px 24px; border-radius:16px; cursor:pointer; transition:all 0.3s ease;">
+      <summary style="font-size:18px; font-weight:600; display:flex; align-items:center; gap:10px;">🔍 How accurate are the results?</summary>
+      <p style="margin-top:12px; font-weight:500; line-height:1.6;">Our AI model is trained on thousands of crop images with over 90% accuracy. Better image quality improves prediction confidence.</p>
+    </details>
+
+    <details style="background: rgba(255,255,255,0.05); padding:20px 24px; border-radius:16px; cursor:pointer; transition:all 0.3s ease;">
+      <summary style="font-size:18px; font-weight:600; display:flex; align-items:center; gap:10px;">🧴 Are the treatment suggestions safe?</summary>
+      <p style="margin-top:12px; font-weight:500; line-height:1.6;">Yes, all suggestions are based on trusted agricultural practices. Always follow recommended dosages for fertilizers or pesticides.</p>
+    </details>
+
+    <details style="background: rgba(255,255,255,0.05); padding:20px 24px; border-radius:16px; cursor:pointer; transition:all 0.3s ease;">
+      <summary style="font-size:18px; font-weight:600; display:flex; align-items:center; gap:10px;">🌐 Can I use PlantDoc in my local language?</summary>
+      <p style="margin-top:12px; font-weight:500; line-height:1.6;">Yes! PlantDoc supports multiple languages. More local language options will be added over time.</p>
+    </details>
+
+    <details style="background: rgba(255,255,255,0.05); padding:20px 24px; border-radius:16px; cursor:pointer; transition:all 0.3s ease;">
+      <summary style="font-size:18px; font-weight:600; display:flex; align-items:center; gap:10px;">📱 Do I need an internet connection to use PlantDoc?</summary>
+      <p style="margin-top:12px; font-weight:500; line-height:1.6;">Yes, an internet connection is required to process images and get real-time AI predictions and treatment suggestions.</p>
+    </details>
+
+
+  </div>
+</section>
+
+<!-- =================== PREMIUM USER REVIEWS =================== -->
+<section id="reviews" style="padding:60px 20px; background:linear-gradient(120deg,#071226,#081a2b 35%, #071226 100%); color:#e6f7ff; font-family:Inter, sans-serif;">
+  <h2 style="text-align:center; font-size:32px; font-weight:700; margin-bottom:50px;">What Farmers Say</h2>
+
+  <div class="reviews-container" style="display:flex; flex-wrap:wrap; justify-content:center; gap:30px; perspective:1000px;">
+    
+    <!-- Single Review Bubble -->
+    <div class="review-bubble" style="
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(15px);
+      border-radius: 25px;
+      padding: 25px;
+      max-width: 280px;
+      min-height: 140px;
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+      transition: transform 0.3s, box-shadow 0.3s;
+      cursor:pointer;
+    ">
+      <p style="font-size:16px; line-height:1.5;">"PlantDoc saved my wheat crop! Easy to use and super accurate. Highly recommend!"</p>
+      <b style="margin-top:10px; font-size:14px; color:#a0e9ff;">— Ramesh K., Punjab</b>
+    </div>
+    
+        <!-- Hindi Review -->
+    <div class="review-bubble" style="
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(15px);
+      border-radius: 25px;
+      padding: 25px;
+      max-width: 280px;
+      min-height: 140px;
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+      transition: transform 0.3s, box-shadow 0.3s;
+      cursor:pointer;
+    ">
+      <p style="font-size:16px; line-height:1.5;">"मुझे PlantDoc से अपने खेत की फसल की बीमारी तुरंत पता चल गई। बहुत आसान और भरोसेमंद!"</p>
+      <b style="margin-top:10px; font-size:14px; color:#a0e9ff;">— सुनीता म., उत्तर प्रदेश</b>
+    </div>
+
+    <div class="review-bubble" style="
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(15px);
+      border-radius: 25px;
+      padding: 25px;
+      max-width: 280px;
+      min-height: 140px;
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+      transition: transform 0.3s, box-shadow 0.3s;
+      cursor:pointer;
+    ">
+      <p style="font-size:16px; line-height:1.5;">"I can check my vegetables for disease without calling an expert. Amazing tool!"</p>
+      <b style="margin-top:10px; font-size:14px; color:#a0e9ff;">— Sunita M., Karnataka</b>
+    </div>
+
+
+     <!-- Kannada Review -->
+    <div class="review-bubble" style="
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(15px);
+      border-radius: 25px;
+      padding: 25px;
+      max-width: 280px;
+      min-height: 140px;
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+      transition: transform 0.3s, box-shadow 0.3s;
+      cursor:pointer;
+    ">
+      <p style="font-size:16px; line-height:1.5;">"ನನ್ನ ರಾಗಿ ಪಲ್ಲೆ ಹಂಗುಗಳನ್ನು ತಕ್ಷಣ ಕಂಡುಹಿಡಿದಿದೆ. ಸುಲಭ ಮತ್ತು ನಿಖರ!"</p>
+      <b style="margin-top:10px; font-size:14px; color:#a0e9ff;">— ಲಕ್ಷ್ಮೀ ರ., ಕರ್ನಾಟಕ</b>
+    </div>
+
+  </div>
+</section>
+<!-- =================== PREMIUM FOOTER =================== -->
+<footer style="background: rgba(11,18,32,0.95); padding:40px 20px; color:#e6f7ff; text-align:center; backdrop-filter: blur(12px) saturate(140%); border-top:1px solid rgba(255,255,255,0.08); font-family:Inter,sans-serif;">
+  
+  <div style="max-width:1000px; margin:auto; display:flex; flex-wrap:wrap; justify-content:center; gap:24px; align-items:center;">
+    
+    <div style="flex:1 1 200px; text-align:center;">
+      <div style="display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom:12px;">
+        <div style="width:36px; height:36px; border-radius:8px; background:linear-gradient(135deg,#4cafef,#22c1c3); display:flex; align-items:center; justify-content:center; color:white; font-weight:700;">🌱</div>
+        <span style="font-size:18px; font-weight:700;">PLANTDOC</span>
+      </div>
+      <p style="font-weight:500; line-height:1.6;">Healthy crops, happy yields.</p>
+    </div>
+
+    <div style="flex:1 1 200px; display:flex; justify-content:center; gap:12px; flex-wrap:wrap;">
+      <a href="#home" style="padding:10px 22px; border-radius:24px; background: rgba(255,255,255,0.08); color:#e6f7ff; text-decoration:none; font-weight:600; transition:0.3s;">Home</a>
+      <a href="#features" style="padding:10px 22px; border-radius:24px; background: rgba(255,255,255,0.08); color:#e6f7ff; text-decoration:none; font-weight:600; transition:0.3s;">Features</a>
+      <a href="#results" style="padding:10px 22px; border-radius:24px; background: rgba(255,255,255,0.08); color:#e6f7ff; text-decoration:none; font-weight:600; transition:0.3s;">Results</a>
+      <a href="#faq" style="padding:10px 22px; border-radius:24px; background: rgba(255,255,255,0.08); color:#e6f7ff; text-decoration:none; font-weight:600; transition:0.3s;">FAQ</a>
+    </div>
+
+  </div>
+
+  <p style="margin-top:24px; font-size:14px; color:#7da7c2;">© 2025 PlantDoc AI. Made for Indian farmers.</p>
+</footer>
+
+
+<script src="script.js"></script>
+</body>
+</html>
